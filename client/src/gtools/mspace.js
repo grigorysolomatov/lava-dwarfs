@@ -1,0 +1,19 @@
+import { Context } from './context.js';
+
+export const MSpace = () => new Context().sequence({
+    init: ctx => {
+	const ff = new Context(); // funcs
+	const dd = new Context(); // dists
+	const mm = new Context(); // marked
+
+	ctx.funcs = dict => ff.remove(...ff.keys()).assign(dict).into(_ => ctx);
+	ctx.dists = dict => dd.remove(...ff.keys()).assign(dict).into(_ => ctx);
+	ctx.mark = dict => mm.remove(...mm.keys()).assign(dict).into(_ => ctx);
+	// Enable by dists from marked --------------------------------------
+	ctx.raw = dict => x => mm
+	    .map((yy, k) => Math.min(...yy.map(y => dd[k](y, ff[k](x)))))
+	    .map((d, k) => dict[k]?.(d))
+	    .into(ctx => ctx.values().every(u => u));
+	ctx.spread = dict => (...x) => ctx.raw(dict)(x);
+    },
+});

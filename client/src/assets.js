@@ -1,0 +1,32 @@
+export const assets = {
+    'background': 'assets/export/background.png',
+    'curtain': 'assets/export/curtain.png',
+    // -------------------------------------------------------------------------
+    'click': 'assets/export/click.png',
+    'select': 'assets/export/select.png',
+    // -------------------------------------------------------------------------
+    'cancel': 'assets/export/cancel.png',
+    'pass': 'assets/export/pass.png',
+    'jump': 'assets/export/jump.png',
+    // -------------------------------------------------------------------------
+    'tile': 'assets/export/tile.png',
+    'tile-crack': 'assets/export/tile-crack.png',
+    // -------------------------------------------------------------------------
+    'pusher-spawn': 'assets/export/pusher-spawn.png',
+    'pusher-red': 'assets/export/pusher-red.png',
+    'pusher-blue': 'assets/export/pusher-blue.png',
+    'push': 'assets/export/push.png',
+    'explode': 'assets/export/explode.png',
+    'hooker-spawn': 'assets/export/hooker-spawn.png',    
+    'hooker-red': 'assets/export/hooker-red.png',
+    'hooker-blue': 'assets/export/hooker-blue.png',
+    'pull': 'assets/export/pull.png',
+    'pull-tile': 'assets/export/pull-tile.png',
+    'shooter-spawn': 'assets/export/shooter-spawn.png',
+    'shooter-red': 'assets/export/shooter-red.png',
+    'shooter-blue': 'assets/export/shooter-blue.png',
+    'shoot': 'assets/export/shoot.png',
+    'destroy-tile': 'assets/export/destroy-tile.png',
+    'portal-red': 'assets/export/portal-red.png',
+    'portal-blue': 'assets/export/portal-blue.png',        
+};
