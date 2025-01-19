@@ -17,6 +17,7 @@ export const assets = {
     'pusher-blue': 'assets/export/pusher-blue.png',
     'push': 'assets/export/push.png',
     'explode': 'assets/export/explode.png',
+    'swap': 'assets/export/swap.png',
     'hooker-spawn': 'assets/export/hooker-spawn.png',    
     'hooker-red': 'assets/export/hooker-red.png',
     'hooker-blue': 'assets/export/hooker-blue.png',

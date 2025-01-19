@@ -8,8 +8,8 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	ctx.abilities = {
 	    pusher: {
 		'push': 'push',
-		'explode': 'explode',
-		'jump': 'jump',
+		// 'explode': 'explode',
+		'jump3': 'jump',
 		'pass': 'pass',
 	    },
 	    shooter: {
@@ -145,6 +145,32 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	// await verbs.swap('units', p0, p0, {anim: anims.jump});
 	// await verbs.cswap('units', p1, p2, {anim: anims.jump});
 
+	return 'pass';
+    },
+    'swap': async ctx => {
+	const {verbs, anims, types} = ctx;
+	
+	const p0 = verbs.selected();
+	const filter = MSpace()
+	      .funcs({
+		  pos: pos => pos,
+		  units: pos => verbs.get('units', pos),
+	      })
+	      .dists({
+		  pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
+		  units: (a, b) => 1*(a !== b),
+	      })
+	      .mark({pos: [p0], units: [undefined]})
+	      .raw({pos: d => 0 < d && d <= 2, units: d => d > 0});
+	const options = {
+	    'act': 'cancel',
+	};
+	const choice = await verbs.action(filter, options);
+	if (typeof choice === 'string') { return choice; }	
+	const p1 = choice;
+
+	await verbs.swap('units', p0, p1, {anim: anims.jump});
+	
 	return 'pass';
     },
     'explode': async ctx => {
@@ -350,6 +376,34 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	      })
 	      .mark({pos: [p0], units: [undefined]})
 	      .raw({pos: d => d === 2, units: d => d === 0});
+	const options = {
+	    'act': 'cancel',
+	};
+	const choice = await verbs.action(filter, options);
+	if (typeof choice === 'string') { return choice; }
+	const p1 = choice;
+	verbs.select(p1);
+	await verbs.cswap('units', p0, p1, {anim: anims.jump});
+
+	return 'pass';
+    },
+    'jump3': async ctx => {
+	const {verbs, anims} = ctx;
+
+	if (verbs.actions() <= 0) { return 'pass'; }
+	
+	const p0 = verbs.selected();
+	const filter = MSpace()
+	      .funcs({
+		  pos: pos => pos,
+		  units: pos => verbs.get('units', pos),
+	      })
+	      .dists({
+		  pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
+		  units: (a, b) => 1*(a !== b),
+	      })
+	      .mark({pos: [p0], units: [undefined]})
+	      .raw({pos: d => [2, 3].includes(d), units: d => d === 0});
 	const options = {
 	    'act': 'cancel',
 	};

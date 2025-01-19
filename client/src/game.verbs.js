@@ -132,6 +132,34 @@ export const verbs = async ctx => {
 	    swap(sprite0, sprite1);
 	    await swap(sprite1, sprite0);
 	},
+	swap: async (sprite0, sprite1) => {
+	    const swap = async (s0, s1) => {
+		const originY = s0.originY;
+		const angle = s0.angle;
+		const duration = 500;		    
+		const sign = Math.floor(Math.random()*2)*2 - 1;
+		s0.setDepth(100 + s1.y).tween({x: s1.x, y: s1.y, duration});
+		await s0.tween({
+		    t: {from: 0, to: 1},
+		    yoyo: true,
+		    duration: 0.5*duration,			
+		    onUpdate: (tween, target) => {
+			const t = target.t;
+			s0
+			    .setOrigin(0.5, originY + t)
+			    .setScale(s0.baseScale*(1 + 0.5*t))
+			    .setAngle(angle + t*10*sign);
+		    },
+		});
+		s0.tween({
+		    yoyo: true,
+		    duration: 150,
+		    scaleY: {from: s0.scaleY, to: 0.9*s0.scaleY},
+		})
+	    };	    
+	    await swap(sprite0, sprite1);
+	    await swap(sprite1, sprite0);
+	},
     };
     const types = {
 	tile: async sprite => {
