@@ -30,6 +30,7 @@ export const assets = {
     'mech-red': 'assets/export/mech-red.png',
     'mech-blue': 'assets/export/mech-blue.png',
     'shoot': 'assets/export/shoot.png',
+    'rookshoot': 'assets/export/rookshoot.png',
     'destroy-tile': 'assets/export/destroy-tile.png',
     'portal-red': 'assets/export/portal-red.png',
     'portal-blue': 'assets/export/portal-blue.png',        

@@ -3,9 +3,16 @@ import {Context} from './gtools/context.js';
 
 export const units = async (ctx, unit) => await new Context({...ctx}).stateMachine({
     who: async ctx => {
-	if (unit === 'portal') { return 'portal'; }
+	const {verbs} = ctx;
 	
 	ctx.abilities = {
+	    'portal': {
+		'ninja': 'ninja-spawn',
+		'hooker': 'hooker-spawn',
+		'cowboy': 'cowboy-spawn',
+		'mech': 'mech-spawn',
+		'cancel': 'cancel',
+	    },
 	    'ninja': {
 		'push': 'push',
 		'jump3': 'jump',
@@ -23,24 +30,48 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 		'pass': 'pass',
 	    },
 	    'mech': {
-		'jump': 'jump',
+		'rookshoot': 'rookshoot',
+		'rookjump': 'jump',
 		'pass': 'pass',
 	    },
 	}[unit] || {'pass': 'pass'};
+
 	
-	return 'step';
+	if (false && unit === 'mech') {
+	    ctx.movement = pos => MSpace()
+		.funcs({
+		    pos: pos => pos,
+		    units: pos => verbs.get('units', pos),
+		})
+		.dists({
+		    pos: (a, b) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]),
+		    units: (a, b) => 1*(a !== b),
+		})
+		.mark({pos: [pos], units: [undefined]})
+		.raw({pos: d => d === 1, units: d => d === 0});
+	}
+	else {
+	    ctx.movement = pos => MSpace()
+		.funcs({
+		    pos: pos => pos,
+		    units: pos => verbs.get('units', pos),
+		})
+		.dists({
+		    pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
+		    units: (a, b) => 1*(a !== b),
+		})
+		.mark({pos: [pos], units: [undefined]})
+		.raw({pos: d => d === 1, units: d => d === 0});
+	}
+
+	if (unit === 'portal') { return 'portal'; }
+	else { return 'step'; }	
     },
     portal: async ctx => {
 	const {verbs, anims} = ctx;
 	
 	const pos = verbs.selected();
-	const unit = await verbs.action(() => false, {
-	    'ninja': 'ninja-spawn',
-	    'hooker': 'hooker-spawn',
-	    'cowboy': 'cowboy-spawn',
-	    // 'mech': 'mech-spawn',
-	    'cancel': 'cancel',
-	});
+	const unit = await verbs.action(() => false, ctx.abilities);
 	if (unit === 'cancel') { return; }
 	
 	const color = ['red', 'blue'][verbs.turn()];
@@ -53,21 +84,10 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	const {verbs, anims} = ctx;
 	
 	const p0 = verbs.selected();
-	const filter = MSpace()
-	      .funcs({
-		  pos: pos => pos,
-		  units: pos => verbs.get('units', pos),
-	      })
-	      .dists({
-		  pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
-		  units: (a, b) => 1*(a !== b),
-	      })
-	      .mark({pos: [p0], units: [undefined]})
-	      .raw({pos: d => d === 1, units: d => d === 0});
 	const options = {
 	    'select': 'cancel',
 	};
-	const choice = await verbs.action(filter, options);
+	const choice = await verbs.action(ctx.movement(p0), options);
 	if (typeof choice === 'string') { return choice; }
 	const p1 = choice;
 	verbs.select(p1);
@@ -82,20 +102,8 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	const {verbs, anims} = ctx;
 
 	if (verbs.actions() <= 0) { return 'pass'; }
-	
 	const p0 = verbs.selected();
-	const filter = MSpace()
-	      .funcs({
-		  pos: pos => pos,
-		  units: pos => verbs.get('units', pos),
-	      })
-	      .dists({
-		  pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
-		  units: (a, b) => 1*(a !== b),
-	      })
-	      .mark({pos: [p0], units: [undefined]})
-	      .raw({pos: d => d === 1, units: d => d === 0});
-	const choice = await verbs.action(filter, ctx.abilities);
+	const choice = await verbs.action(ctx.movement(p0), ctx.abilities);
 	if (typeof choice === 'string') { return choice; }
 	const p1 = choice;
 	verbs.select(p1);
@@ -245,6 +253,47 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 
 	return 'pass';
     },
+    'rookshoot': async ctx => {
+	const {verbs, anims, types} = ctx;
+	
+	const p0 = verbs.selected();
+	const filter = MSpace()
+	      .funcs({
+		  pos: p => [
+		      p[0] - p0[0],
+		      p[1] - p0[1],
+		  ].includes(0)? p : p0,
+		  units: pos => verbs.get('units', pos),
+	      })
+	      .dists({
+		  pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
+		  units: (a, b) => 1*(a !== b),
+	      })
+	      .mark({pos: [p0], units: [undefined]})
+	      .raw({pos: d => d > 0, units: d => d > 0});
+	const options = {
+	    'act': 'cancel',
+	};
+	const choice = await verbs.action(filter, options);
+	if (typeof choice === 'string') { return choice; }
+	
+	const p1 = choice;
+	const d = [p1[0] - p0[0], p1[1] - p0[1]].map(u => Math.max(-1, Math.min(1, u)));
+	const p2 = [p1[0] + d[0], p1[1] + d[1]];
+
+	if (verbs.get('units', p2)) {
+	    await verbs.swap('units', p0, p0, {anim: anims.jump});
+	    await verbs.swap('units', p1, p1, {anim: anims.jump});
+	}
+	else {
+	    await verbs.swap('units', p0, p0, {anim: anims.jump});
+	    await verbs.cswap('units', p1, p2, {anim: anims.jump});
+	}
+	// await verbs.swap('units', p0, p0, {anim: anims.jump});
+	// await verbs.cswap('units', p1, p2, {anim: anims.jump});
+
+	return 'pass';
+    },
     'pull': async ctx => {
 	const {verbs, anims, types} = ctx;
 	
@@ -380,6 +429,37 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	      })
 	      .mark({pos: [p0], units: [undefined]})
 	      .raw({pos: d => d === 2, units: d => d === 0});
+	const options = {
+	    'act': 'cancel',
+	};
+	const choice = await verbs.action(filter, options);
+	if (typeof choice === 'string') { return choice; }
+	const p1 = choice;
+	verbs.select(p1);
+	await verbs.cswap('units', p0, p1, {anim: anims.jump});
+
+	return 'pass';
+    },
+    'rookjump': async ctx => {
+	const {verbs, anims} = ctx;
+
+	if (verbs.actions() <= 0) { return 'pass'; }
+	
+	const p0 = verbs.selected();
+	const filter = MSpace()
+	      .funcs({
+		  pos: p => [
+		      p[0] - p0[0],
+		      p[1] - p0[1],
+		  ].includes(0)? p : p0,
+		  units: pos => verbs.get('units', pos),
+	      })
+	      .dists({
+		  pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
+		  units: (a, b) => 1*(a !== b),
+	      })
+	      .mark({pos: [p0], units: [undefined]})
+	      .raw({pos: d => d > 0, units: d => d === 0});
 	const options = {
 	    'act': 'cancel',
 	};
