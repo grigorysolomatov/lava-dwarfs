@@ -6,20 +6,23 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	if (unit === 'portal') { return 'portal'; }
 	
 	ctx.abilities = {
-	    pusher: {
+	    'ninja': {
 		'push': 'push',
-		// 'explode': 'explode',
 		'jump3': 'jump',
 		'pass': 'pass',
 	    },
-	    shooter: {
+	    'cowboy': {
 		'shoot': 'shoot',
 		'destroy-tile': 'destroy-tile',
 		'jump': 'jump', 'pass': 'pass',
 	    },
-	    hooker: {
+	    'hooker': {
 		'pull-tile': 'pull-tile',
 		'pull': 'pull',
+		'jump': 'jump',
+		'pass': 'pass',
+	    },
+	    'mech': {
 		'jump': 'jump',
 		'pass': 'pass',
 	    },
@@ -32,9 +35,10 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	
 	const pos = verbs.selected();
 	const unit = await verbs.action(() => false, {
-	    'pusher': 'pusher-spawn',
+	    'ninja': 'ninja-spawn',
 	    'hooker': 'hooker-spawn',
-	    'shooter': 'shooter-spawn',
+	    'cowboy': 'cowboy-spawn',
+	    // 'mech': 'mech-spawn',
 	    'cancel': 'cancel',
 	});
 	if (unit === 'cancel') { return; }
