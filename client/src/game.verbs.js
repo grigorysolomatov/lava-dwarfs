@@ -110,7 +110,7 @@ export const verbs = async ctx => {
 		const angle = s0.angle;
 		const duration = 500;		    
 		const sign = Math.floor(Math.random()*2)*2 - 1;
-		s0.setDepth(100 + s1.y).tween({x: s1.x, y: s1.y, duration});
+		s0.tween({x: s1.x, y: s1.y, depth: 100 + s1.y, duration});
 		await s0.tween({
 		    t: {from: 0, to: 1},
 		    yoyo: true,

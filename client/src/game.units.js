@@ -11,6 +11,7 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 		'hooker': 'hooker-spawn',
 		'cowboy': 'cowboy-spawn',
 		'mech': 'mech-spawn',
+		'brute': 'brute-spawn',
 		'cancel': 'cancel',
 	    },
 	    'ninja': {
@@ -32,6 +33,12 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	    'mech': {
 		'rookshoot': 'rookshoot',
 		'rookjump': 'jump',
+		'pass': 'pass',
+	    },
+	    'brute': {
+		'throw': 'throw',
+		'smash': 'smash',
+		'jump': 'jump',
 		'pass': 'pass',
 	    },
 	}[unit] || {'pass': 'pass'};
@@ -497,6 +504,62 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	verbs.select(p1);
 	await verbs.cswap('units', p0, p1, {anim: anims.jump});
 
+	return 'pass';
+    },
+    'throw': async ctx => {
+	const {verbs, anims, types} = ctx;
+	
+	const p0 = verbs.selected();
+	const filter = MSpace()
+	      .funcs({
+		  pos: pos => pos,
+		  units: pos => verbs.get('units', pos),
+	      })
+	      .dists({
+		  pos: (a, b) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]),
+		  units: (a, b) => 1*(a !== b),
+	      })
+	      .mark({pos: [p0], units: [undefined]})
+	      .raw({pos: d => d === 1, units: d => d > 0});
+	const options = {
+	    'act': 'cancel',
+	};
+	const choice = await verbs.action(filter, options);
+	if (typeof choice === 'string') { return choice; }
+	
+	const p1 = choice;
+	const d = [p1[0] - p0[0], p1[1] - p0[1]];
+	const p2 = [p1[0] - 2*d[0], p1[1] - 2*d[1]];
+
+	if (verbs.get('units', p2)) {
+	    await verbs.swap('units', p0, p0, {anim: anims.jump});
+	    await verbs.swap('units', p1, p1, {anim: anims.jump});
+	}
+	else {
+	    await verbs.swap('units', p0, p0, {anim: anims.jump});
+	    await verbs.cswap('units', p1, p2, {anim: anims.jump});
+	}
+
+	// await verbs.swap('units', p0, p0, {anim: anims.jump});
+	// await verbs.cswap('units', p1, p2, {anim: anims.jump});
+
+	return 'pass';
+    },
+    'smash': async ctx => {
+	const {verbs, anims, types} = ctx;
+	
+	const p0 = verbs.selected();
+	await verbs.swap('units', p0, p0, {anim: anims.jump});
+	await Context
+	    .range(9)
+	    .map(i => [Math.floor(i/3) - 1, i%3 - 1])
+	    .map(d => [p0[0] + d[0], p0[1] + d[1]])
+	    .filter(p => verbs.get('tiles', p))
+	    .map(async p => await verbs.replace.one('tiles', p, 'tile-crack', {
+		type: types.tile, anim: anims.crack
+	    }))
+	    .into(u => Promise.all(u.values()));
+	
 	return 'pass';
     },
 });
