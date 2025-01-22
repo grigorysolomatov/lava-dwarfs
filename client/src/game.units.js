@@ -12,6 +12,7 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 		'cowboy': 'cowboy-spawn',
 		'mech': 'mech-spawn',
 		'brute': 'brute-spawn',
+		'sumoist': 'sumoist-spawn',
 		'cancel': 'cancel',
 	    },
 	    'ninja': {
@@ -38,6 +39,11 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	    'brute': {
 		'throw': 'throw',
 		'smash': 'smash',
+		'jump': 'jump',
+		'pass': 'pass',
+	    },
+	    'sumoist': {
+		'sumojump': 'sumojump',
 		'jump': 'jump',
 		'pass': 'pass',
 	    },
@@ -166,58 +172,6 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 
 	return 'pass';
     },
-    'swap': async ctx => {
-	const {verbs, anims, types} = ctx;
-	
-	const p0 = verbs.selected();
-	const filter = MSpace()
-	      .funcs({
-		  pos: pos => pos,
-		  units: pos => verbs.get('units', pos),
-	      })
-	      .dists({
-		  pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
-		  units: (a, b) => 1*(a !== b),
-	      })
-	      .mark({pos: [p0], units: [undefined]})
-	      .raw({pos: d => 0 < d && d <= 2, units: d => d > 0});
-	const options = {
-	    'act': 'cancel',
-	};
-	const choice = await verbs.action(filter, options);
-	if (typeof choice === 'string') { return choice; }	
-	const p1 = choice;
-
-	await verbs.swap('units', p0, p1, {anim: anims.jump});
-	
-	return 'pass';
-    },
-    'explode': async ctx => {
-	const {verbs, anims, types} = ctx;
-	
-	const p0 = verbs.selected();
-
-	await verbs.swap('units', p0, p0, {anim: anims.jump});
-	await Context
-	    .range(9)
-	    .map(i => [Math.floor(i/3) - 1, i%3 - 1])
-	    .filter(([row, col]) => row !== 0 || col !== 0)
-	    .map(d => [
-		[p0[0] + d[0], p0[1] + d[1]],
-		[p0[0] + 2*d[0], p0[1] + 2*d[1]],
-	    ])
-	    .map(async ([p1, p2]) => {
-		if (verbs.get('units', p2)) {
-		    await verbs.swap('units', p1, p1, {anim: anims.jump});
-		}
-		else {
-		    await verbs.cswap('units', p1, p2, {anim: anims.jump});
-		}
-	    })
-	    .into(u => Promise.all(u.values()));
-
-	return 'pass';
-    },
     'shoot': async ctx => {
 	const {verbs, anims, types} = ctx;
 	
@@ -255,8 +209,6 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	    await verbs.swap('units', p0, p0, {anim: anims.jump});
 	    await verbs.cswap('units', p1, p2, {anim: anims.jump});
 	}
-	// await verbs.swap('units', p0, p0, {anim: anims.jump});
-	// await verbs.cswap('units', p1, p2, {anim: anims.jump});
 
 	return 'pass';
     },
@@ -296,8 +248,6 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	    await verbs.swap('units', p0, p0, {anim: anims.jump});
 	    await verbs.cswap('units', p1, p2, {anim: anims.jump});
 	}
-	// await verbs.swap('units', p0, p0, {anim: anims.jump});
-	// await verbs.cswap('units', p1, p2, {anim: anims.jump});
 
 	return 'pass';
     },
@@ -338,9 +288,6 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	    await verbs.swap('units', p0, p0, {anim: anims.jump});
 	    await verbs.cswap('units', p1, p2, {anim: anims.jump});
 	}
-	
-	// await verbs.swap('units', p0, p0, {anim: anims.jump});
-	// await verbs.cswap('units', p1, p2, {anim: anims.jump});
 
 	return 'pass';
     },
@@ -447,6 +394,59 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 
 	return 'pass';
     },
+    'sumojump': async ctx => {
+	const {verbs, anims, types} = ctx;
+
+	if (verbs.actions() <= 0) { return 'pass'; }
+	
+	const p0 = verbs.selected();
+	const filter = MSpace()
+	      .funcs({
+		  pos: p => [
+		      p[0] - p0[0],
+		      p[1] - p0[1],
+		  ].includes(0)? p : p0,
+		  units: pos => verbs.get('units', pos),
+	      })
+	      .dists({
+		  pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
+		  units: (a, b) => 1*(a !== b),
+	      })
+	      .mark({pos: [p0], units: [undefined]})
+	      .raw({pos: d => d === 2, units: d => d === 0});
+	const options = {
+	    'act': 'cancel',
+	};
+	const choice = await verbs.action(filter, options);
+	if (typeof choice === 'string') { return choice; }
+	const p1 = choice;
+	verbs.select(p1);
+	await verbs.cswap('units', p0, p1, {anim: anims.jump});
+	await Context
+	    .range(9)
+	    .map(i => [Math.floor(i/3) - 1, i%3 - 1])
+	    .filter(([row, col]) => row !== 0 || col !== 0)
+	    .map(d => [
+		[p1[0] + d[0], p1[1] + d[1]],
+		[p1[0] + 2*d[0], p1[1] + 2*d[1]],
+	    ])
+	    .map(async ([p1, p2]) => {
+		if (!verbs.get('units', p1) && verbs.get('tiles', p1)) {
+		    await verbs.replace.one('tiles', p1, 'tile-crack', {
+			type: types.tile, anim: anims.crack
+		    });
+		}
+		if (verbs.get('units', p2)) {
+		    await verbs.swap('units', p1, p1, {anim: anims.jump});
+		}
+		else {
+		    await verbs.cswap('units', p1, p2, {anim: anims.jump});
+		}
+	    })
+	    .into(u => Promise.all(u.values()));
+
+	return 'pass';
+    },
     'rookjump': async ctx => {
 	const {verbs, anims} = ctx;
 
@@ -515,9 +515,10 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 		  pos: pos => pos,
 		  units: pos => verbs.get('units', pos),
 	      })
-	      .dists({
+	      .dists({		  
 		  pos: (a, b) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]),
 		  units: (a, b) => 1*(a !== b),
+		  // pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
 	      })
 	      .mark({pos: [p0], units: [undefined]})
 	      .raw({pos: d => d === 1, units: d => d > 0});
@@ -540,9 +541,6 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	    await verbs.cswap('units', p1, p2, {anim: anims.jump});
 	}
 
-	// await verbs.swap('units', p0, p0, {anim: anims.jump});
-	// await verbs.cswap('units', p1, p2, {anim: anims.jump});
-
 	return 'pass';
     },
     'smash': async ctx => {
@@ -560,6 +558,59 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	    }))
 	    .into(u => Promise.all(u.values()));
 	
+	return 'pass';
+    },
+    // -------------------------------------------------------------------------
+    'swap': async ctx => {
+	const {verbs, anims, types} = ctx;
+	
+	const p0 = verbs.selected();
+	const filter = MSpace()
+	      .funcs({
+		  pos: pos => pos,
+		  units: pos => verbs.get('units', pos),
+	      })
+	      .dists({
+		  pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
+		  units: (a, b) => 1*(a !== b),
+	      })
+	      .mark({pos: [p0], units: [undefined]})
+	      .raw({pos: d => 0 < d && d <= 2, units: d => d > 0});
+	const options = {
+	    'act': 'cancel',
+	};
+	const choice = await verbs.action(filter, options);
+	if (typeof choice === 'string') { return choice; }	
+	const p1 = choice;
+
+	await verbs.swap('units', p0, p1, {anim: anims.jump});
+	
+	return 'pass';
+    },
+    'explode': async ctx => {
+	const {verbs, anims, types} = ctx;
+	
+	const p0 = verbs.selected();
+
+	await verbs.swap('units', p0, p0, {anim: anims.jump});
+	await Context
+	    .range(9)
+	    .map(i => [Math.floor(i/3) - 1, i%3 - 1])
+	    .filter(([row, col]) => row !== 0 || col !== 0)
+	    .map(d => [
+		[p0[0] + d[0], p0[1] + d[1]],
+		[p0[0] + 2*d[0], p0[1] + 2*d[1]],
+	    ])
+	    .map(async ([p1, p2]) => {
+		if (verbs.get('units', p2)) {
+		    await verbs.swap('units', p1, p1, {anim: anims.jump});
+		}
+		else {
+		    await verbs.cswap('units', p1, p2, {anim: anims.jump});
+		}
+	    })
+	    .into(u => Promise.all(u.values()));
+
 	return 'pass';
     },
 });

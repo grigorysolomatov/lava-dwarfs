@@ -7,11 +7,13 @@ export const assets = {
     // -------------------------------------------------------------------------
     'cancel': 'assets/export/cancel.png',
     'pass': 'assets/export/pass.png',
-    'jump': 'assets/export/jump.png',
+    'jump': 'assets/export/jump.png',    
     // -------------------------------------------------------------------------
     'tile': 'assets/export/tile.png',
     'tile-crack': 'assets/export/tile-crack.png',
     // -------------------------------------------------------------------------
+    'portal-red': 'assets/export/portal-red.png',
+    'portal-blue': 'assets/export/portal-blue.png',
     'ninja-spawn': 'assets/export/ninja-spawn.png',
     'ninja-red': 'assets/export/ninja-red.png',
     'ninja-blue': 'assets/export/ninja-blue.png',
@@ -32,11 +34,14 @@ export const assets = {
     'brute-spawn': 'assets/export/brute-spawn.png',
     'brute-red': 'assets/export/brute-red.png',
     'brute-blue': 'assets/export/brute-blue.png',
+    'sumoist-spawn': 'assets/export/sumoist-spawn.png',
+    'sumoist-red': 'assets/export/sumoist-red.png',
+    'sumoist-blue': 'assets/export/sumoist-blue.png',    
+    
     'smash': 'assets/export/smash.png',
     'throw': 'assets/export/throw.png',
     'shoot': 'assets/export/shoot.png',
     'rookshoot': 'assets/export/rookshoot.png',
-    'destroy-tile': 'assets/export/destroy-tile.png',
-    'portal-red': 'assets/export/portal-red.png',
-    'portal-blue': 'assets/export/portal-blue.png',        
+    'sumojump': 'assets/export/sumojump.png',    
+    'destroy-tile': 'assets/export/destroy-tile.png',        
 };
