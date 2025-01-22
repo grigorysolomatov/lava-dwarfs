@@ -337,7 +337,6 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	const {verbs, anims, types} = ctx;
 
 	const p0 = verbs.selected();
-
 	for (let i = 0; i < 2; i++) {
 	    const filter = MSpace()
 		  .funcs({
@@ -350,8 +349,8 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 		      units: (a, b) => 1*(a !== b),
 		      tiles: (a, b) => 1*(a !== b),
 		  })
-		  .mark({pos: [p0], units: [undefined], tiles: ['tile']})
-		  .raw({pos: d => d <= 2, units: d => d === 0, tiles: d => d === 0});
+		  .mark({pos: [p0], units: [undefined], tiles: [undefined]})
+		  .raw({pos: d => d <= 2, units: d => d === 0, tiles: d => d > 0});
 	    const options = i === 0? {
 		'act': 'cancel',
 	    } : {
@@ -431,7 +430,7 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 		[p1[0] + 2*d[0], p1[1] + 2*d[1]],
 	    ])
 	    .map(async ([p1, p2]) => {
-		if (!verbs.get('units', p1) && verbs.get('tiles', p1)) {
+		if (false && !verbs.get('units', p1) && verbs.get('tiles', p1)) {
 		    await verbs.replace.one('tiles', p1, 'tile-crack', {
 			type: types.tile, anim: anims.crack
 		    });
