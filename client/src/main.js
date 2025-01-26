@@ -1,10 +1,14 @@
-import { Context } from './gtools/context.js';
-import { GGame } from './ggame/ggame.js';
-import { online } from './online.js';
-import { assets } from './assets.js';
+import {Context} from './gtools/context.js';
 
-export const main = async () => await new Context().sequence({
-    defaults: ctx => {
+import {GG} from './ggame/ggame.js';
+import {menu} from './ggame/menu.js';
+import {server} from './ggame/server.js';
+
+import {online} from './online.js';
+import {assets} from './assets.js';
+
+export const main = async () => await new Context().steps({
+    setup: async ctx => {
 	const height = window.innerHeight;
 	const width = Math.min(window.innerWidth, height/1.6);
 	const config = {
@@ -27,16 +31,17 @@ export const main = async () => await new Context().sequence({
 		delay: 100,
 	    },
 	};
-	ctx.assign({config, defaults, width, height});
-    },
-    setup: async ctx => {
-	const {config, defaults} = ctx;	
 	
-	const gg = await GGame({config, defaults});
+	const gg = await GG().assign({config, defaults}).start();
 	await gg.fonts('Modak');
-	await gg.assets(assets);
-
-	ctx.assign({gg});
+	await gg.assets(assets);		
+	
+	ctx.assign({gg, width, height});
+    },
+    addons: ctx => {
+	const {gg} = ctx;
+	menu(gg);
+	server(gg);
     },
     background: ctx => {
 	const {gg, width, height} = ctx;
@@ -81,8 +86,7 @@ export const main = async () => await new Context().sequence({
     },
     menu: async ctx => {
 	const {gg} = ctx;
-
-	const choice = await gg.menu({play: 'Play'});	
+	const choice = await gg.menu({play: 'Play'});
 	await online(ctx);
     },
 });

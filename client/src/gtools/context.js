@@ -54,7 +54,7 @@ export class Context {
 	    return this;
 	}
     }
-    sequence(dict) {
+    steps(dict) {
 	return this.onto(...Object.values(dict));
     }
     log() {

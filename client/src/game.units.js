@@ -88,7 +88,6 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	if (unit === 'cancel') { return; }
 	
 	const color = ['red', 'blue'][verbs.turn()];
-	verbs.replace.one('overlay', pos, undefined);
 	await verbs.replace.one('units', pos, `${unit}-${color}`);
 
 	return 'pass';
@@ -229,7 +228,7 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 		  units: (a, b) => 1*(a !== b),
 	      })
 	      .mark({pos: [p0], units: [undefined]})
-	      .raw({pos: d => d > 0, units: d => d > 0});
+	      .raw({pos: d => 0 < d && d <= 2, units: d => d > 0});
 	const options = {
 	    'act': 'cancel',
 	};
@@ -295,40 +294,44 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	const {verbs, anims, types} = ctx;
 	
 	const p0 = verbs.selected();
-	const inRange = MSpace()
-	      .funcs({
-		  pos: p => [
-		      p[0] - p0[0],
-		      p[1] - p0[1],
-		      Math.abs(p[0] - p0[0]) - Math.abs(p[1] - p0[1]),
-		  ].includes(0)? p : p0,
-		  tiles: pos => verbs.get('tiles', pos),
-	      })
-	      .dists({
-		  pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
-		  tiles: (a, b) => 1*(a !== b),
-	      })
-	      .mark({pos: [p0], tiles: [undefined]})
-	      .raw({pos: d => d === 2, tiles: d => d > 0});
-	const filter = p1 => {
-	    const p = [0.5*(p0[0] + p1[0]), 0.5*(p0[1] + p1[1])]; // mid
-	    const isSpace = p => verbs.get('tiles', p) === undefined;
-	    return inRange(p1) && isSpace(p);
-	};
-	const options = {
-	    'act': 'cancel',
-	};
-	const choice = await verbs.action(filter, options);
-	if (typeof choice === 'string') { return choice; }
-	
-	const p1 = choice;
-	const d = [p1[0] - p0[0], p1[1] - p0[1]];
-	const p2 = [p1[0] - d[0]/2, p1[1] - d[1]/2];
+	for (let i = 0; i < 2; i++) {
+	    const inRange = MSpace()
+		  .funcs({
+		      pos: p => [
+			  p[0] - p0[0],
+			  p[1] - p0[1],
+			  Math.abs(p[0] - p0[0]) - Math.abs(p[1] - p0[1]),
+		      ].includes(0)? p : p0,
+		      tiles: pos => verbs.get('tiles', pos),
+		  })
+		  .dists({
+		      pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
+		      tiles: (a, b) => 1*(a !== b),
+		  })
+		  .mark({pos: [p0], tiles: [undefined]})
+		  .raw({pos: d => d === 2, tiles: d => d > 0});
+	    const filter = p1 => {
+		const p = [0.5*(p0[0] + p1[0]), 0.5*(p0[1] + p1[1])]; // mid
+		const isSpace = p => verbs.get('tiles', p) === undefined;
+		return inRange(p1) && isSpace(p);
+	    };
+	    const options = i === 0? {
+		'act': 'cancel',
+	    } : {
+		'pass': 'pass',
+	    };
+	    const choice = await verbs.action(filter, options);
+	    if (typeof choice === 'string') { return choice; }
+	    
+	    const p1 = choice;
+	    const d = [p1[0] - p0[0], p1[1] - p0[1]];
+	    const p2 = [p1[0] - d[0]/2, p1[1] - d[1]/2];
 
-	await verbs.swap('units', p0, p0, {anim: anims.jump});
-	verbs.swap('units', p1, p2, {anim: anims.slide});
-	if (!verbs.get('tiles', p2)) {
-	    await verbs.swap('tiles', p1, p2, {anim: anims.slide});
+	    await verbs.swap('units', p0, p0, {anim: anims.jump});
+	    verbs.swap('units', p1, p2, {anim: anims.slide});
+	    if (!verbs.get('tiles', p2)) {
+		await verbs.swap('tiles', p1, p2, {anim: anims.slide});
+	    }
 	}
 
 	return 'pass';

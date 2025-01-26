@@ -1,6 +1,6 @@
 import { Context } from './context.js';
 
-export const MSpace = () => new Context().sequence({
+export const MSpace = () => new Context().steps({
     init: ctx => {
 	const ff = new Context(); // funcs
 	const dd = new Context(); // dists

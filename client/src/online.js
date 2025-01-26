@@ -1,10 +1,10 @@
 import { Context } from './gtools/context.js';
 import { game } from './game.js';
 
-export const online = async ctx => ctx.sequence({
-    msg: ctx => {
+export const online = async ctx => ctx.steps({
+    opponent: async ctx => {
 	const {gg, width, height} = ctx;
-	
+
 	const msg = gg.text(0.5*width, 0.5*height, 'Finding Opponent').setOrigin(0.5);
 	msg.tween({alpha: {from: 0, to: 1}});
 	msg.tween({
@@ -12,13 +12,8 @@ export const online = async ctx => ctx.sequence({
 	    yoyo: true,
 	    repeat: -1,
 	});
-
-	ctx.assign({msg});
-    },
-    opponent: async ctx => {
-	const {gg, width, height, msg} = ctx;
 	
-	const server = await gg.connect();
+	const server = await gg.server();
 	const res = await server.send('unplay', 'all');
 	await server.send('play', 'random');
 	msg.tween({alpha: 0, onComplete: () => msg.destroy()});

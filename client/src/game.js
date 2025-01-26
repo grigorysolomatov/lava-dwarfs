@@ -1,7 +1,7 @@
 import {verbs} from './game.verbs.js';
 import {states} from './game.states.js';
 
-export const game = async ctx => await ctx.sequence({verbs, states});
+export const game = async ctx => await ctx.steps({verbs, states});
 
 const __HIDE__ = {
     board: async ctx => {

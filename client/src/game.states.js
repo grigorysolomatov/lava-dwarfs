@@ -18,11 +18,8 @@ export const states = async ctx => ctx.stateMachine({
 	const [row, col] = [(nrows-1)/2, (ncols-1)/2];
 
 	const portal = async (pos, key) => {
-	    verbs.replace.one('units', pos, key, {
-		type: types.portal(1), anim: anims.grow,
-	    });
-	    await verbs.replace.one('overlay', pos, key, {
-		type: types.portal(-1), anim: anims.grow,
+	    await verbs.replace.one('units', pos, key, {
+		type: types.portal, anim: anims.grow,
 	    });
 	};
 	portal([row-2, col-2], 'portal-red');

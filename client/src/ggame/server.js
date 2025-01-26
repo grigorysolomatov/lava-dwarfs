@@ -1,5 +1,5 @@
-export const online = async ctx => {
-    ctx.connect = async () => {
+export const server = async ctx => {
+    ctx.server = async () => {
 	localStorage.clear();
 	const socket = io();
 	const view = message => Array.isArray(message) ? '[' + message.join(', ') + ']' : message;
