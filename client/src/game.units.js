@@ -228,7 +228,7 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 		  units: (a, b) => 1*(a !== b),
 	      })
 	      .mark({pos: [p0], units: [undefined]})
-	      .raw({pos: d => 0 < d && d <= 2, units: d => d > 0});
+	      .raw({pos: d => 0 < d && d <= 3, units: d => d > 0});
 	const options = {
 	    'act': 'cancel',
 	};
