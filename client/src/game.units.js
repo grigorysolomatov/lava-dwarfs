@@ -11,8 +11,8 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 		'hooker': 'hooker-spawn',
 		'cowboy': 'cowboy-spawn',
 		'mech': 'mech-spawn',
-		'brute': 'brute-spawn',
-		'sumoist': 'sumoist-spawn',
+		// 'brute': 'brute-spawn',
+		// 'sumoist': 'sumoist-spawn',
 		'cancel': 'cancel',
 	    },
 	    'ninja': {
@@ -48,7 +48,6 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 		'pass': 'pass',
 	    },
 	}[unit] || {'pass': 'pass'};
-
 	
 	if (false && unit === 'mech') {
 	    ctx.movement = pos => MSpace()
@@ -131,7 +130,8 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 
 	verbs.crack();
 	verbs.pass();
-    },    
+    },
+    // -------------------------------------------------------------------------
     'push': async ctx => {
 	const {verbs, anims, types} = ctx;
 	
@@ -228,7 +228,7 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 		  units: (a, b) => 1*(a !== b),
 	      })
 	      .mark({pos: [p0], units: [undefined]})
-	      .raw({pos: d => 0 < d && d <= 3, units: d => d > 0});
+	      .raw({pos: d => 1 < d && d <= 3, units: d => d > 0});
 	const options = {
 	    'act': 'cancel',
 	};
