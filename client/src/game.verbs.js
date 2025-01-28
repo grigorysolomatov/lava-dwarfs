@@ -371,7 +371,7 @@ export const verbs = ctx => ctx.steps({
 	    crack: async () => {
 		await POS
 		    .filter(pos => verbs.get('units', pos))
-		    .filter(pos => verbs.get('tiles', pos) === 'tile')
+		    .filter(pos => ['tile', 'tile-grass'].includes(verbs.get('tiles', pos)))
 		    .map(async pos => await verbs.replace.one('tiles', pos, 'tile-crack', {
 			type: types.tile, anim: anims.crack
 		    }))

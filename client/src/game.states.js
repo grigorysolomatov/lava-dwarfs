@@ -60,7 +60,7 @@ export const states = async ctx => ctx.stateMachine({
 	await units(ctx, unit);
 	
 	return 'select';
-    },
+    },    
 });
 
 const __HIDE__ = {

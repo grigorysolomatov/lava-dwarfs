@@ -11,7 +11,8 @@ export const assets = {
     // -------------------------------------------------------------------------
     'tile': 'assets/export/tile.png',
     'tile-crack': 'assets/export/tile-crack.png',
-    // -------------------------------------------------------------------------
+    'tile-grass': 'assets/export/tile-grass.png',
+    // -------------------------------------------------------------------------    
     'portal-red': 'assets/export/portal-red.png',
     'portal-blue': 'assets/export/portal-blue.png',
     'ninja-spawn': 'assets/export/ninja-spawn.png',
@@ -36,8 +37,9 @@ export const assets = {
     'brute-blue': 'assets/export/brute-blue.png',
     'sumoist-spawn': 'assets/export/sumoist-spawn.png',
     'sumoist-red': 'assets/export/sumoist-red.png',
-    'sumoist-blue': 'assets/export/sumoist-blue.png',    
-    
+    'sumoist-blue': 'assets/export/sumoist-blue.png',
+
+    'grass-tile': 'assets/export/grass-tile.png',
     'smash': 'assets/export/smash.png',
     'throw': 'assets/export/throw.png',
     'shoot': 'assets/export/shoot.png',
