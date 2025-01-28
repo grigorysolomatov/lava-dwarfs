@@ -48,7 +48,7 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	verbs.select(p1);
 	await verbs.cswap('units', p0, p1, {anim: anims.jump});
 
-	verbs.replace.one('tiles', p1, 'tile', {type: types.tile, anim: anims.fade});
+	// verbs.replace.one('tiles', p1, 'tile', {type: types.tile, anim: anims.fade});
 	
 	if (!verbs.get('units', verbs.selected())) { return 'pass'; }
 
@@ -66,7 +66,7 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	verbs.select(p1);
 	await verbs.cswap('units', p0, p1, {anim: anims.jump});
 
-	verbs.replace.one('tiles', p1, 'tile', {type: types.tile, anim: anims.fade});
+	// verbs.replace.one('tiles', p1, 'tile', {type: types.tile, anim: anims.fade});
 
 	if (!verbs.get('units', verbs.selected())) { return 'pass'; }
 
