@@ -5,18 +5,33 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
     // Flow --------------------------------------------------------------------
     who: async ctx => {
 	const {verbs} = ctx;
-
-	ctx.movement = pos => MSpace()
-	    .funcs({
-		pos: pos => pos,
-		units: pos => verbs.get('units', pos),
-	    })
-	    .dists({
-		pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
-		units: (a, b) => 1*(a !== b),
-	    })
-	    .mark({pos: [pos], units: [undefined]})
-	    .raw({pos: d => d === 1, units: d => d === 0});
+	
+	if (unit === 'mech') {
+	    ctx.movement = pos => MSpace()
+		.funcs({
+		    pos: pos => pos,
+		    units: pos => verbs.get('units', pos),
+		})
+		.dists({
+		    pos: (a, b) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]),
+		    units: (a, b) => 1*(a !== b),
+		})
+		.mark({pos: [pos], units: [undefined]})
+		.raw({pos: d => d === 1, units: d => d === 0});
+	}
+	else {
+	    ctx.movement = pos => MSpace()
+		.funcs({
+		    pos: pos => pos,
+		    units: pos => verbs.get('units', pos),
+		})
+		.dists({
+		    pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
+		    units: (a, b) => 1*(a !== b),
+		})
+		.mark({pos: [pos], units: [undefined]})
+		.raw({pos: d => d === 1, units: d => d === 0});
+	}
 
 	return dudes[unit](ctx);
     },
@@ -644,7 +659,7 @@ const dudes = {
 		'rookShoot': 'rookshoot',
 		'rookjump': 'jump',
 		'pass': 'pass',
-	    };
+	    };	    
 	    return 'step';
 	},
     }),
