@@ -13,10 +13,14 @@ export const states = async ctx => ctx.stateMachine({
 	    return 'tile';
 	}, {
 	    type: types.tile, anim: anims.spin
-	});
+	});	
+
+	return 'portals';
+    },
+    portals: async ctx => {	
+	const {verbs, anims, types, nrows, ncols} = ctx;
 
 	const [row, col] = [(nrows-1)/2, (ncols-1)/2];
-
 	const portal = async (pos, key) => {
 	    await verbs.replace.one('units', pos, key, {
 		type: types.portal, anim: anims.grow,

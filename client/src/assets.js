@@ -32,14 +32,20 @@ export const assets = {
     'mech-spawn': 'assets/export/mech-spawn.png',
     'mech-red': 'assets/export/mech-red.png',
     'mech-blue': 'assets/export/mech-blue.png',
+
+    'druid-spawn': 'assets/export/druid-spawn.png',
+    'druid-red': 'assets/export/druid-red.png',
+    'druid-blue': 'assets/export/druid-blue.png',
+    'grass-tile': 'assets/export/grass-tile.png',
+    'destroy-grass': 'assets/export/destroy-grass.png',
+    
     'brute-spawn': 'assets/export/brute-spawn.png',
     'brute-red': 'assets/export/brute-red.png',
     'brute-blue': 'assets/export/brute-blue.png',
     'sumoist-spawn': 'assets/export/sumoist-spawn.png',
     'sumoist-red': 'assets/export/sumoist-red.png',
     'sumoist-blue': 'assets/export/sumoist-blue.png',
-
-    'grass-tile': 'assets/export/grass-tile.png',
+    
     'smash': 'assets/export/smash.png',
     'throw': 'assets/export/throw.png',
     'shoot': 'assets/export/shoot.png',
