@@ -49,7 +49,7 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	await verbs.cswap('units', p0, p1, {anim: anims.jump});
 
 	// verbs.replace.one('tiles', p1, 'tile', {type: types.tile, anim: anims.fade});
-	if (verbs.get('tiles', verbs.selected()) === 'tile-grass') { return 'pass'; }
+	if (true && verbs.get('tiles', verbs.selected()) === 'tile-grass') { return 'pass'; }
 	if (!verbs.get('units', verbs.selected())) { return 'pass'; }
 
 	verbs.act();
@@ -68,7 +68,7 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 
 	// verbs.replace.one('tiles', p1, 'tile', {type: types.tile, anim: anims.fade});
 
-	if (unit !== 'druid' && verbs.get('tiles', verbs.selected()) === 'tile-grass') { return 'pass'; }
+	if (true && verbs.get('tiles', verbs.selected()) === 'tile-grass') { return 'pass'; }
 	if (!verbs.get('units', verbs.selected())) { return 'pass'; }
 
 	verbs.act();
@@ -341,7 +341,7 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 		      tiles: (a, b) => 1*(a !== b),
 		  })
 		  .mark({pos: [p0], tiles: ['tile-grass']})
-		  .raw({pos: d => d <= 2, tiles: d => d === 0});
+		  .raw({pos: d => d > 0, tiles: d => d === 0});
 	    const options = i === 0? {
 		'act': 'cancel',
 	    } : {
@@ -353,7 +353,46 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	    const p1 = choice;
 	    console.log(verbs.get('tiles', p1))
 	    
-	    await verbs.replace.one('tiles', p1, undefined, {type: types.click, anim: anims.fade});
+	    await verbs.replace.one('tiles', p1, 'tile', {type: types.tile, anim: anims.fade});
+	}
+
+	return 'pass';
+    },
+    crackTile: async ctx => {
+	const {verbs, anims, types} = ctx;
+
+	const p0 = verbs.selected();
+	for (let i = 0; i < 2; i++) {
+	    const filter = MSpace()
+		  .funcs({
+		      pos: pos => pos,
+		      units: pos => verbs.get('units', pos),
+		      tiles: pos => verbs.get('tiles', pos),
+		  })
+		  .dists({
+		      pos: (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])),
+		      units: (a, b) => 1*(a !== b),
+		      tiles: (a, b) => 1*(a !== b),
+		  })
+		  .mark({pos: [p0], units: [undefined], tiles: [undefined]})
+		  .raw({pos: d => d <= 2, units: d => d === 0, tiles: d => d > 0});
+	    const options = i === 0? {
+		'act': 'cancel',
+	    } : {
+		'pass': 'pass',
+	    };
+	    const choice = await verbs.action(filter, options);
+	    if (typeof choice === 'string') { return choice; }
+	    
+	    const p1 = choice;
+	    console.log(verbs.get('tiles', p1))
+
+	    if (verbs.get('tiles', p1) === 'tile-grass') {
+		await verbs.replace.one('tiles', p1, 'tile', {type: types.tile, anim: anims.fade});
+	    }
+	    else if (verbs.get('tiles', p1) === 'tile') {
+		await verbs.replace.one('tiles', p1, 'tile-crack', {type: types.tile, anim: anims.fade});
+	    }
 	}
 
 	return 'pass';
@@ -737,13 +776,14 @@ const dudes = {
 	setup: async ctx => {
 	    console.log('HOOKER');
 	    ctx.abilities = {
-		'pullTile': 'pull-tile',		
+		'pullTile': 'pull-tile',
+		'crackTile': 'crack-tile',
 		'pull': 'pull',
 		'jump': 'jump',
 		'pass': 'pass',
 	    };
 	    return 'step';
-	},	
+	},
     }),
     mech: ctx => ctx.stateMachine({
 	setup: async ctx => {
@@ -761,7 +801,7 @@ const dudes = {
 	    console.log('DRUID');
 	    ctx.abilities = {
 		'grassTile': 'grass-tile',
-		//'destroyGrass': 'destroy-grass',
+		'destroyGrass': 'destroy-grass',
 		'druhit': 'push',
 		'jump': 'jump',
 		'pass': 'pass',

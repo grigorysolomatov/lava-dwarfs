@@ -11,6 +11,7 @@ export const assets = {
     // -------------------------------------------------------------------------
     'tile': 'assets/export/tile.png',
     'tile-crack': 'assets/export/tile-crack.png',
+    'crack-tile': 'assets/export/crack-tile.png', // EYE
     'tile-grass': 'assets/export/tile-grass.png',
     // -------------------------------------------------------------------------    
     'portal-red': 'assets/export/portal-red.png',
