@@ -341,7 +341,7 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 		      tiles: (a, b) => 1*(a !== b),
 		  })
 		  .mark({pos: [p0], tiles: ['tile-grass']})
-		  .raw({pos: d => d > 0, tiles: d => d === 0});
+		  .raw({pos: d => d <= 2, tiles: d => d === 0});
 	    const options = i === 0? {
 		'act': 'cancel',
 	    } : {
@@ -816,8 +816,8 @@ const dudes = {
 		'ninja': 'ninja-spawn',
 		'hooker': 'hooker-spawn',
 		'cowboy': 'cowboy-spawn',
-		'mech': 'mech-spawn',
 		'druid': 'druid-spawn',
+		'mech': 'mech-spawn',
 		// 'brute': 'brute-spawn',
 		// 'sumoist': 'sumoist-spawn',
 		'cancel': 'cancel',
