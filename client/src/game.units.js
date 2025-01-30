@@ -559,7 +559,7 @@ export const units = async (ctx, unit) => await new Context({...ctx}).stateMachi
 	      .mark({pos: [p1], units: [undefined]})
 	      .raw({pos: d => d === 1, units: d => d === 0});	
 	const choice1 = await verbs.action(filter1, options);
-	if (typeof choice1 === 'string') { return choice0; }
+	if (typeof choice1 === 'string') { return choice1; }
 	const p2 = choice1;
 	if (verbs.get('units', p2)) {
 	    await verbs.swap('units', p0, p0, {anim: anims.jump});
